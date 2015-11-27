@@ -7,6 +7,17 @@
   </div>
 <% end %>
 
+<% if @gems && @gems.size < 1 && @gems.respond_to?(:response) && (suggestions = @gems.response.response['suggest']) && suggestions.present? && suggestions['suggest_name'].present? && suggestions['suggest_name'][0]['options'].length > 0  %>
+  <div class='search-suggestions'>
+    <p>
+      Maybe you mean
+      <%= suggestions.map { |k,v| v.first['options'] }.flatten.map {|v| v['text']}.uniq.map do |term|
+        link_to term, search_path(params.except(:controller, :action).merge query: term)
+      end.to_sentence(last_word_connector: ' or ').html_safe %>?
+    </p>
+  </div>
+<% end %>
+
 <% if @gems %>
   <% @subtitle = t('.subtitle', :query => content_tag(:em, h(params[:query]))) %>
 
